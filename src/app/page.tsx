@@ -1,6 +1,10 @@
 import CopyButton from "./copyButtom";
 
-export default async function Home({ searchParams }) {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ token: string }>;
+}) {
   const params = await searchParams;
   const data = await fetch(
     "https://accounts.cartpanda.com/api/eightcomercio/products",
@@ -17,7 +21,14 @@ export default async function Home({ searchParams }) {
     }
 
     const realData = await data.json();
-    const products = realData.products.data;
+    const products = realData.products.data as {
+      title: string;
+      product_variants: {
+        title: string;
+        price: string;
+        id: string;
+      }[];
+    }[];
 
     const productsVariants = [] as {
       product_title: string;
@@ -80,12 +91,14 @@ export default async function Home({ searchParams }) {
         </main>
       </div>
     );
-  } catch (error) {
+  } catch (error: unknown) {
     return (
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
           <h1 className="text-4xl font-bold">Welcome to EightComercio</h1>
-          <p className="text-red-500">{error.message}</p>
+          <p className="text-red-500">
+            {(error as { message: string }).message}
+          </p>
         </main>
       </div>
     );
