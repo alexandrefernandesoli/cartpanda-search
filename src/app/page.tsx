@@ -1,3 +1,4 @@
+import Image from "next/image";
 import CopyButton from "./copyButtom";
 
 export default async function Home({
@@ -21,26 +22,37 @@ export default async function Home({
     }
 
     const realData = await data.json();
-    const products = realData.products.data as {
+    let products = realData.products.data as {
       title: string;
+      id: number;
       product_variants: {
         title: string;
         price: string;
-        id: string;
+        id: number;
+        variant_image?: { image: { url: string } }[];
       }[];
     }[];
 
+    products = products.filter((product) => product.id != 18774493);
+
     const productsVariants = [] as {
+      image?: string;
       product_title: string;
       title: string;
       price: string;
-      id: string;
+      id: number;
       checkout: string;
     }[];
 
     products.forEach((product) => {
       product.product_variants.forEach((variant) => {
+        const image =
+          variant.variant_image && variant.variant_image[0]
+            ? variant.variant_image[0].image.url
+            : undefined;
+
         productsVariants.push({
+          image: image,
           product_title: product.title,
           title: variant.title,
           price: variant.price,
@@ -69,6 +81,7 @@ export default async function Home({
           <table>
             <thead>
               <tr className="border">
+                <th className="p-2">Image</th>
                 <th className="p-2">Product</th>
                 <th className="p-2">Title</th>
                 <th className="p-2">Price</th>
@@ -78,6 +91,16 @@ export default async function Home({
             <tbody>
               {productsVariants.map((product) => (
                 <tr className="border" key={product.id}>
+                  <td className="p-2">
+                    {product.image && (
+                      <Image
+                        src={product.image}
+                        alt={product.product_title}
+                        width="90"
+                        height="90"
+                      />
+                    )}
+                  </td>
                   <td className="p-2">{product.product_title}</td>
                   <td className="p-2">{product.title}</td>
                   <td className="p-2">{product.price}</td>
