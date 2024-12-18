@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
 
   // image host assets.mycartpanda.com
   images: {
-    domains: ["assets.mycartpanda.com"],
+    domains: ["assets.mycartpanda.com", "via.placeholder.com"],
   },
 };
 

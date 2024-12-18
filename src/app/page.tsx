@@ -29,6 +29,7 @@ export default async function Home({
         title: string;
         price: string;
         id: number;
+        sku: string;
         variant_image?: { image: { url: string } }[];
       }[];
     }[];
@@ -42,6 +43,7 @@ export default async function Home({
       price: string;
       id: number;
       checkout: string;
+      sku: string;
     }[];
 
     products.forEach((product) => {
@@ -57,6 +59,7 @@ export default async function Home({
           title: variant.title,
           price: variant.price,
           id: variant.id,
+          sku: variant.sku,
           checkout: `https://eightcomercio.mycartpanda.com/checkout/${variant.id}:1`,
         });
       });
@@ -85,26 +88,41 @@ export default async function Home({
                 <th className="p-2">Product</th>
                 <th className="p-2">Title</th>
                 <th className="p-2">Price</th>
+                <th className="p-2">SKU</th>
                 <th className="p-2">Checkout</th>
               </tr>
             </thead>
             <tbody>
               {productsVariants.map((product) => (
                 <tr className="border" key={product.id}>
-                  <td className="p-2">
-                    {product.image && (
+                  <td className="p-2 text-center">
+                    {product.image ? (
                       <Image
                         src={product.image}
                         alt={product.product_title}
                         width="90"
                         height="90"
                       />
+                    ) : (
+                      // placeholder from https://placeholder.com/
+                      <Image
+                        src="https://via.placeholder.com/90"
+                        alt={product.product_title}
+                        width="90"
+                        height="90"
+                      />
                     )}
                   </td>
-                  <td className="p-2">{product.product_title}</td>
-                  <td className="p-2">{product.title}</td>
-                  <td className="p-2">{product.price}</td>
-                  <td className="p-2">
+                  <td className="p-2 text-center">{product.product_title}</td>
+                  <td className="p-2 text-center">{product.title}</td>
+                  <td className="p-2 text-center">{product.price}</td>
+                  <td className="p-2 text-center">{product.sku}</td>
+                  <td className="p-2 text-center text-blue-500 hover:underline">
+                    <a href={product.checkout} target="_blank">
+                      {product.checkout}
+                    </a>
+                  </td>
+                  <td className="p-2 text-center">
                     <CopyButton text={product.checkout} />
                   </td>
                 </tr>
