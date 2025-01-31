@@ -1,5 +1,7 @@
 import Image from "next/image";
 import CopyButton from "./copyButtom";
+import { getProducts } from "@/lib/products";
+import Link from "next/link";
 
 export default async function Home({
   searchParams,
@@ -7,74 +9,9 @@ export default async function Home({
   searchParams: Promise<{ token: string }>;
 }) {
   const params = await searchParams;
-  const data = await fetch(
-    "https://accounts.cartpanda.com/api/eightcomercio/products",
-    {
-      headers: {
-        Authorization: `Bearer ${params.token}`,
-      },
-    }
-  );
 
   try {
-    if (!data.ok) {
-      throw new Error("Failed to fetch data");
-    }
-
-    const realData = await data.json();
-    let products = realData.products.data as {
-      title: string;
-      id: number;
-      product_variants: {
-        title: string;
-        price: string;
-        id: number;
-        sku: string;
-        variant_image?: { image: { url: string } }[];
-      }[];
-    }[];
-
-    products = products.filter((product) => product.id != 18774493);
-
-    const productsVariants = [] as {
-      image?: string;
-      product_title: string;
-      title: string;
-      price: string;
-      id: number;
-      checkout: string;
-      sku: string;
-    }[];
-
-    products.forEach((product) => {
-      product.product_variants.forEach((variant) => {
-        const image =
-          variant.variant_image && variant.variant_image[0]
-            ? variant.variant_image[0].image.url
-            : undefined;
-
-        productsVariants.push({
-          image: image,
-          product_title: product.title,
-          title: variant.title,
-          price: variant.price,
-          id: variant.id,
-          sku: variant.sku,
-          checkout: `https://eightcomercio.mycartpanda.com/checkout/${variant.id}:1`,
-        });
-      });
-    });
-
-    // order by product_title
-    productsVariants.sort((a, b) => {
-      if (a.product_title < b.product_title) {
-        return -1;
-      }
-      if (a.product_title > b.product_title) {
-        return 1;
-      }
-      return 0;
-    });
+    const products = await getProducts(params);
 
     return (
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -89,11 +26,13 @@ export default async function Home({
                 <th className="p-2">Title</th>
                 <th className="p-2">Price</th>
                 <th className="p-2">SKU</th>
+                <th className="p-2">Rede</th>
+                <th className="p-2">Tipo</th>
                 <th className="p-2">Checkout</th>
               </tr>
             </thead>
             <tbody>
-              {productsVariants.map((product) => (
+              {products.map((product) => (
                 <tr className="border" key={product.id}>
                   <td className="p-2 text-center">
                     {product.image ? (
@@ -113,10 +52,21 @@ export default async function Home({
                       />
                     )}
                   </td>
-                  <td className="p-2 text-center">{product.product_title}</td>
+                  <td className="p-2 text-center">
+                    <Link
+                      href={`/${product.product_id}?token=${params.token}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      {product.product_title}
+                    </Link>
+                  </td>
                   <td className="p-2 text-center">{product.title}</td>
                   <td className="p-2 text-center">{product.price}</td>
                   <td className="p-2 text-center">{product.sku}</td>
+                  <td className="p-2 text-center">{product.decoded.rede}</td>
+                  <td className="p-2 text-center">
+                    {product.decoded.tipo_de_venda}
+                  </td>
                   <td className="p-2 text-center text-blue-500 hover:underline">
                     <a href={product.checkout} target="_blank">
                       {product.checkout}
