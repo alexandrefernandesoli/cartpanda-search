@@ -92,7 +92,7 @@ const decodeSKU = (sku: string) => {
 export async function getProducts({ token }: { token: string }) {
   try {
     const data = await fetch(
-      "https://accounts.cartpanda.com/api/gruposixllp/products",
+      "https://accounts.cartpanda.com/api/eightcomercio/products",
       {
         headers: {
           Authorization: `Bearer ${token}`,
