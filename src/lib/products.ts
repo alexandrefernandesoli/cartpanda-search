@@ -156,7 +156,7 @@ export async function getProducts({ token }: { token: string }) {
           id: variant.id,
           sku: variant.sku,
           decoded: decodeSKU(variant.sku),
-          checkout: `https://gruposixllp.mycartpanda.com/checkout/${variant.id}:1`,
+          checkout: `https://eightcomercio.mycartpanda.com/checkout/${variant.id}:1`,
         });
       });
     });
@@ -181,7 +181,7 @@ export async function getProducts({ token }: { token: string }) {
 
 export async function getProduct({ token, id }: { token: string; id: string }) {
   const response = await fetch(
-    `https://accounts.cartpanda.com/api/gruposixllp/products/${id}`,
+    `https://accounts.cartpanda.com/api/eightcomercio/products/${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -228,7 +228,7 @@ export async function getProduct({ token, id }: { token: string; id: string }) {
       id: variant.id,
       sku: variant.sku,
       decoded: decodeSKU(variant.sku),
-      checkout: `https://gruposixllp.mycartpanda.com/checkout/${variant.id}:1`,
+      checkout: `https://eightcomercio.mycartpanda.com/checkout/${variant.id}:1`,
     });
   });
 
