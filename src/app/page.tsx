@@ -1,97 +1,70 @@
-import Image from "next/image";
-import CopyButton from "./copyButtom";
-import { getProducts } from "@/lib/products";
-import Link from "next/link";
+import { setAuthCookies } from "./server";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ token: string }>;
-}) {
-  const params = await searchParams;
-
-  try {
-    const products = await getProducts(params);
-
-    return (
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-          <h1 className="text-4xl font-bold">Welcome to EightComercio</h1>
-
-          <table>
-            <thead>
-              <tr className="border">
-                <th className="p-2">Image</th>
-                <th className="p-2">Product</th>
-                <th className="p-2">Title</th>
-                <th className="p-2">Price</th>
-                <th className="p-2">SKU</th>
-                <th className="p-2">Rede</th>
-                <th className="p-2">Tipo</th>
-                <th className="p-2">Checkout</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr className="border" key={product.id}>
-                  <td className="p-2 text-center">
-                    {product.image ? (
-                      <Image
-                        src={product.image}
-                        alt={product.product_title}
-                        width="90"
-                        height="90"
-                      />
-                    ) : (
-                      // placeholder from https://placeholder.com/
-                      <Image
-                        src="https://via.placeholder.com/90"
-                        alt={product.product_title}
-                        width="90"
-                        height="90"
-                      />
-                    )}
-                  </td>
-                  <td className="p-2 text-center">
-                    <Link
-                      href={`/${product.product_id}?token=${params.token}`}
-                      className="text-blue-500 hover:underline"
-                    >
-                      {product.product_title}
-                    </Link>
-                  </td>
-                  <td className="p-2 text-center">{product.title}</td>
-                  <td className="p-2 text-center">{product.price}</td>
-                  <td className="p-2 text-center">{product.sku}</td>
-                  <td className="p-2 text-center">{product.decoded.rede}</td>
-                  <td className="p-2 text-center">
-                    {product.decoded.tipo_de_venda}
-                  </td>
-                  <td className="p-2 text-center text-blue-500 hover:underline">
-                    <a href={product.checkout} target="_blank">
-                      {product.checkout}
-                    </a>
-                  </td>
-                  <td className="p-2 text-center">
-                    <CopyButton text={product.checkout} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </main>
+export default function Page() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 p-6">
+      <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200">
+        <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
+          Set Auth Cookies
+        </h2>
+        <form action={setAuthCookies} className="space-y-6">
+          <div>
+            <label
+              htmlFor="slug"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              User Slug
+            </label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              required
+              placeholder="Enter user slug"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="token"
+              className="block text-sm font-semibold text-gray-700 mb-2"
+            >
+              Authentication Token
+            </label>
+            <input
+              type="text"
+              id="token"
+              name="token"
+              required
+              placeholder="Enter auth token"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition duration-200 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Set Cookies
+          </button>
+        </form>
       </div>
-    );
-  } catch (error: unknown) {
-    return (
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-        <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-          <h1 className="text-4xl font-bold">Welcome to EightComercio</h1>
-          <p className="text-red-500">
-            {(error as { message: string }).message}
-          </p>
-        </main>
-      </div>
-    );
-  }
+    </div>
+  );
 }
+
+// // Optional: Middleware for cookie protection (in middleware.ts)
+// export function middleware(request: NextRequest) {
+//   const token = request.cookies.get("auth-token");
+//   const slug = request.cookies.get("user-slug");
+
+//   // Example of protected route logic
+//   if (!token || !slug) {
+//     return NextResponse.redirect(new URL("/login", request.url));
+//   }
+
+//   return NextResponse.next();
+// }
+
+// export const config = {
+//   matcher: ["/dashboard/:path*", "/profile/:path*"],
+// };

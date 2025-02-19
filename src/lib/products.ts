@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 const skuData = {
   conta: ["GrupoSixLLP"],
   squad: ["Delta", "Echo"],
@@ -12,6 +14,7 @@ const skuData = {
     "PUREGUTPRO",
     "NERVEBLISS",
     "BACKSHIFTPRO",
+    "MOUNJAGUMMY",
   ],
   vsl: [
     "CALLCENTER",
@@ -35,6 +38,7 @@ const skuData = {
     "AFILIADOS",
     "EMAIL",
     "SMS",
+    "GERAL",
   ],
   tipo_de_venda: ["CALLCENTER", "FRONT", "BACKREDIRECT", "UPSELL", "DOWNSELL"],
   kit: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
@@ -94,13 +98,23 @@ const decodeSKU = (sku: string) => {
   return decoded;
 };
 
-export async function getProducts({ token }: { token: string }) {
+export async function getProducts() {
+  // get cookie slug
+  const c = await cookies();
+
+  const slug = c.get("slug");
+  const token = c.get("token");
+
+  if (!slug || !token) {
+    throw new Error("Slug and token are required");
+  }
+
   try {
     const data = await fetch(
-      "https://accounts.cartpanda.com/api/eightcomercio/products",
+      `https://accounts.cartpanda.com/api/${slug.value}/products`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token.value}`,
         },
       }
     );
@@ -161,7 +175,7 @@ export async function getProducts({ token }: { token: string }) {
           id: variant.id,
           sku: variant.sku,
           decoded: decodeSKU(variant.sku),
-          checkout: `https://eightcomercio.mycartpanda.com/checkout/${variant.id}:1`,
+          checkout: `https://${slug.value}.mycartpanda.com/checkout/${variant.id}:1`,
         });
       });
     });
@@ -184,12 +198,21 @@ export async function getProducts({ token }: { token: string }) {
   }
 }
 
-export async function getProduct({ token, id }: { token: string; id: string }) {
+export async function getProduct({ id }: { id: string }) {
+  const c = await cookies();
+
+  const slug = c.get("slug");
+  const token = c.get("token");
+
+  if (!slug || !token) {
+    throw new Error("Slug and token are required");
+  }
+
   const response = await fetch(
-    `https://accounts.cartpanda.com/api/eightcomercio/products/${id}`,
+    `https://accounts.cartpanda.com/api/${slug.value}/products/${id}`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token.value}`,
       },
     }
   );
@@ -233,7 +256,7 @@ export async function getProduct({ token, id }: { token: string; id: string }) {
       id: variant.id,
       sku: variant.sku,
       decoded: decodeSKU(variant.sku),
-      checkout: `https://eightcomercio.mycartpanda.com/checkout/${variant.id}:1`,
+      checkout: `https://${slug.value}.mycartpanda.com/checkout/${variant.id}:1`,
     });
   });
 
