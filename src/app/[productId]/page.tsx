@@ -1,6 +1,7 @@
 import { getProduct } from "@/lib/products";
 import Image from "next/image";
 import CopyButton from "../copyButtom";
+import CSVDownloader from "./CSVDownloader";
 
 export default async function ProductPage({
   params,
@@ -11,11 +12,15 @@ export default async function ProductPage({
   const pageParams = await params;
   const product = await getProduct({ id: pageParams.productId });
 
+  console.log({ product })
+
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 className="text-4xl font-bold text-gray-100 mb-8 text-center">
         {product.title}
       </h1>
+
+      <CSVDownloader product={product} />
 
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="min-w-full divide-y divide-gray-200">
