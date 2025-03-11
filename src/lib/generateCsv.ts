@@ -1,9 +1,11 @@
 // generateCSV para logística
-export function generateCSV(product) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function generateCSV(product: any) {
   const headers = "Product, SKU";
   const productRow = `${product.title},`;
   const csvRows = product.product_variants.map(
-    (variant) => `${variant.title},${variant.sku}`
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (variant: any) => `${variant.title},${variant.sku}`
   );
   const csvData = `data:text/csv;charset=utf-8,${headers}\n${productRow}\n${csvRows.join(
     "\n"
